@@ -1,0 +1,586 @@
+[
+  {
+    "type": "function",
+    "name": "CLUE_COUNT",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "TOTAL_ROUNDS",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "createGame",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "_players",
+        "type": "address[4]",
+        "internalType": "address[4]"
+      },
+      {
+        "name": "_teams",
+        "type": "uint8[4]",
+        "internalType": "uint8[4]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "finalizeRound",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "getClueReveal",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "flags",
+        "type": "bool[5]",
+        "internalType": "bool[5]"
+      },
+      {
+        "name": "ready",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getClueTextHashes",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32[5]",
+        "internalType": "bytes32[5]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getGame",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "phase",
+        "type": "uint8",
+        "internalType": "enum SignalVsNoise.Phase"
+      },
+      {
+        "name": "round",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "scoreA",
+        "type": "uint16",
+        "internalType": "uint16"
+      },
+      {
+        "name": "scoreB",
+        "type": "uint16",
+        "internalType": "uint16"
+      },
+      {
+        "name": "guesser",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "helper",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "saboteur",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "observer",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "master",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getPlayers",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address[4]",
+        "internalType": "address[4]"
+      },
+      {
+        "name": "",
+        "type": "uint8[4]",
+        "internalType": "uint8[4]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getRevealedSecret",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "wordHash",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "ready",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getSecretHandle",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "euint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "resolveTimeout",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "startRound",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "guesserIdx",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "helperIdx",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "saboteurIdx",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "observerIdx",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "secretIn",
+        "type": "tuple",
+        "internalType": "struct InEuint256",
+        "components": [
+          {
+            "name": "ctHash",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "securityZone",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "utype",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "signature",
+            "type": "bytes",
+            "internalType": "bytes"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "submitClues",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "textHashes",
+        "type": "bytes32[5]",
+        "internalType": "bytes32[5]"
+      },
+      {
+        "name": "realFlags",
+        "type": "tuple[5]",
+        "internalType": "struct InEbool[5]",
+        "components": [
+          {
+            "name": "ctHash",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "securityZone",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "utype",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "signature",
+            "type": "bytes",
+            "internalType": "bytes"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "submitGuess",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "guessIn",
+        "type": "tuple",
+        "internalType": "struct InEuint256",
+        "components": [
+          {
+            "name": "ctHash",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "securityZone",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "utype",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "signature",
+            "type": "bytes",
+            "internalType": "bytes"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "CluesSubmitted",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "round",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "GameCreated",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "master",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "GameOver",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "scoreA",
+        "type": "uint16",
+        "indexed": false,
+        "internalType": "uint16"
+      },
+      {
+        "name": "scoreB",
+        "type": "uint16",
+        "indexed": false,
+        "internalType": "uint16"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "GuessSubmitted",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "round",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "guesser",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RoundResolved",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "round",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "correct",
+        "type": "bool",
+        "indexed": false,
+        "internalType": "bool"
+      },
+      {
+        "name": "scoreA",
+        "type": "uint16",
+        "indexed": false,
+        "internalType": "uint16"
+      },
+      {
+        "name": "scoreB",
+        "type": "uint16",
+        "indexed": false,
+        "internalType": "uint16"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RoundStarted",
+    "inputs": [
+      {
+        "name": "roomId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "round",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "guesser",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "helper",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "saboteur",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "observer",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "InvalidEncryptedInput",
+    "inputs": [
+      {
+        "name": "got",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "expected",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "SecurityZoneOutOfBounds",
+    "inputs": [
+      {
+        "name": "value",
+        "type": "int32",
+        "internalType": "int32"
+      }
+    ]
+  }
+]

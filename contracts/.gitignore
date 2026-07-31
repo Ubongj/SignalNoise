@@ -1,0 +1,10 @@
+# Foundry
+out/
+cache/
+broadcast/
+
+# Deps
+node_modules/
+
+# Secrets
+.env
