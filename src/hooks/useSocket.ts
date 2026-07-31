@@ -6,7 +6,10 @@ let _socket: Socket | null = null;
 
 function getSocket(): Socket {
   if (!_socket) {
-    _socket = io({ transports: ['websocket', 'polling'] });
+    // Default transports = HTTP long-polling first, then auto-upgrade to
+    // WebSocket. This is the most proxy-friendly setup (Railway/Render/etc.);
+    // forcing websocket-first can fail the handshake behind some hosts.
+    _socket = io({ reconnectionAttempts: 15, timeout: 20000 });
   }
   return _socket;
 }
@@ -21,13 +24,16 @@ export function useSocket() {
     const socket = getSocket();
     socketRef.current = socket;
 
-    const onConnect = () => setConnected(true);
+    const onConnect = () => { setConnected(true); setError(null); };
     const onDisconnect = () => setConnected(false);
     const onStateUpdate = (state: GameState) => { setGameState(state); setError(null); };
     const onError = ({ message }: { message: string }) => setError(message);
+    const onConnectError = (err: Error) =>
+      setError(`Can't reach the game server (${err.message}). Retrying…`);
 
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
+    socket.on('connect_error', onConnectError);
     socket.on('state_update', onStateUpdate);
     socket.on('game_error', onError);
 
@@ -36,6 +42,7 @@ export function useSocket() {
     return () => {
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
+      socket.off('connect_error', onConnectError);
       socket.off('state_update', onStateUpdate);
       socket.off('game_error', onError);
     };

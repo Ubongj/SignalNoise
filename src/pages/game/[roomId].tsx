@@ -30,14 +30,16 @@ export default function GamePage() {
   const [playerName, setPlayerName] = useState('');
   const [joinError, setJoinError]   = useState('');
 
-  // On connect + roomId known: try to pull existing state first (handles demo redirect)
+  // Try to pull existing state first (handles demo redirect), then show the name
+  // entry. Falls through even if the socket hasn't connected — so a connection
+  // problem surfaces as the name screen (with error + "Connecting…"), never an
+  // infinite spinner.
   useEffect(() => {
-    if (!connected || !roomId) return;
-    requestState();
-    // After 600 ms with no response, show name entry
+    if (!roomId) return;
+    if (connected) requestState();
     const fallback = setTimeout(() => {
       setJoinState(s => s === 'checking' ? 'name_entry' : s);
-    }, 600);
+    }, connected ? 600 : 3000);
     return () => clearTimeout(fallback);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connected, roomId]);
