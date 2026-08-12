@@ -124,11 +124,11 @@ function setPhase(room, phase) {
 
 // ─── ROOM MANAGEMENT ─────────────────────────────────────────────────────────
 
-function createRoom(socketId, playerName, isDemo, walletAddress) {
+function createRoom(socketId, playerName, isDemo, walletAddress, clientId) {
   const roomId = generateId();
   const room = {
     id: roomId,
-    players: [{ id: socketId, name: playerName, team: 'A', isHost: true, connected: true, isBot: false, address: walletAddress || null }],
+    players: [{ id: socketId, clientId: clientId || socketId, name: playerName, team: 'A', isHost: true, connected: true, isBot: false, address: walletAddress || null }],
     phase: 'LOBBY',
     currentRound: 0,
     rounds: [],
@@ -156,13 +156,44 @@ function createRoom(socketId, playerName, isDemo, walletAddress) {
   return room;
 }
 
-function joinRoom(socketId, roomId, playerName, walletAddress) {
+// Repoint every stored reference to a player from an old socket id to a new one
+// (used when a player reconnects with a fresh socket after a reload).
+function remapPlayerId(room, oldId, newId) {
+  for (const r of room.rounds || []) {
+    if (r.guesserId === oldId) r.guesserId = newId;
+    if (r.helperId === oldId) r.helperId = newId;
+    if (r.saboteurId === oldId) r.saboteurId = newId;
+    if (r.observerId === oldId) r.observerId = newId;
+    for (const c of r.clues || []) if (c.playerId === oldId) c.playerId = newId;
+  }
+}
+
+function joinRoom(socketId, roomId, playerName, walletAddress, clientId) {
   const room = rooms.get(roomId);
   if (!room) return { error: 'Room not found. Check the code and try again.' };
-  if (!['WAITING', 'LOBBY'].includes(room.phase)) return { error: 'Game already in progress.' };
+
+  // Same socket already in the room (idempotent).
   if (room.players.find(p => p.id === socketId)) { socketToRoom.set(socketId, roomId); return { room }; }
+
+  // Reconnect: a player from this browser (clientId) already has a slot — reattach
+  // it to the new socket instead of creating a duplicate. Works mid-game too.
+  const existing = clientId ? room.players.find(p => p.clientId === clientId && !p.isBot) : null;
+  if (existing) {
+    const oldId = existing.id;
+    existing.id = socketId;
+    existing.connected = true;
+    existing.name = playerName || existing.name;
+    if (walletAddress) existing.address = walletAddress;
+    remapPlayerId(room, oldId, socketId);
+    socketToRoom.delete(oldId);
+    socketToRoom.set(socketId, roomId);
+    return { room, reattached: true };
+  }
+
+  // Otherwise it's a genuinely new player — only allowed before the game starts.
+  if (!['WAITING', 'LOBBY'].includes(room.phase)) return { error: 'Game already in progress.' };
   if (room.players.length >= 4) return { error: 'Room is full (4 players max).' };
-  room.players.push({ id: socketId, name: playerName, team: null, isHost: false, connected: true, isBot: false, address: walletAddress || null });
+  room.players.push({ id: socketId, clientId: clientId || socketId, name: playerName, team: null, isHost: false, connected: true, isBot: false, address: walletAddress || null });
   if (room.players.length >= 2) room.phase = 'LOBBY';
   socketToRoom.set(socketId, roomId);
   return { room };
@@ -517,10 +548,10 @@ app.prepare().then(() => {
 
   io.on('connection', (socket) => {
 
-    socket.on('create_room', ({ playerName, isDemo, walletAddress }, cb) => {
+    socket.on('create_room', ({ playerName, isDemo, walletAddress, clientId }, cb) => {
       console.log(`[create_room] player="${playerName}" isDemo=${isDemo} socket=${socket.id}`);
       try {
-        const room = createRoom(socket.id, playerName, isDemo, walletAddress);
+        const room = createRoom(socket.id, playerName, isDemo, walletAddress, clientId);
         socket.join(room.id);
         cb?.({ roomId: room.id, state: buildStateForPlayer(room, socket.id) });
         broadcastState(room.id, io);
@@ -530,12 +561,12 @@ app.prepare().then(() => {
       }
     });
 
-    socket.on('join_room', ({ roomId, playerName, walletAddress }, cb) => {
-      const result = joinRoom(socket.id, roomId, playerName, walletAddress);
+    socket.on('join_room', ({ roomId, playerName, walletAddress, clientId }, cb) => {
+      const result = joinRoom(socket.id, roomId, playerName, walletAddress, clientId);
       if (result.error) { cb?.({ error: result.error }); return; }
       socket.join(roomId);
       broadcastState(roomId, io);
-      cb?.({ state: buildStateForPlayer(result.room, socket.id) });
+      cb?.({ state: buildStateForPlayer(result.room, socket.id), reattached: !!result.reattached });
     });
 
     socket.on('choose_team', ({ team }) => {

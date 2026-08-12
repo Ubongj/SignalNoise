@@ -4,6 +4,19 @@ import type { GameState, TeamId } from '@/types/game';
 
 let _socket: Socket | null = null;
 
+/** Stable per-browser id so a reload can reattach to the same player slot. */
+function getClientId(): string {
+  if (typeof window === 'undefined') return '';
+  let id = localStorage.getItem('svn_client_id');
+  if (!id) {
+    id = (typeof crypto !== 'undefined' && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : `c_${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
+    localStorage.setItem('svn_client_id', id);
+  }
+  return id;
+}
+
 function getSocket(): Socket {
   if (!_socket) {
     // Default transports = HTTP long-polling first, then auto-upgrade to
@@ -49,8 +62,9 @@ export function useSocket() {
   }, []);
 
   const createRoom = useCallback((playerName: string, isDemo: boolean = false, walletAddress?: string): Promise<{ roomId: string; state: GameState }> => {
+    if (typeof window !== 'undefined') localStorage.setItem('svn_name', playerName);
     return new Promise((resolve, reject) => {
-      getSocket().emit('create_room', { playerName, isDemo, walletAddress }, (res: { roomId?: string; state?: GameState; error?: string }) => {
+      getSocket().emit('create_room', { playerName, isDemo, walletAddress, clientId: getClientId() }, (res: { roomId?: string; state?: GameState; error?: string }) => {
         if (res.error) reject(new Error(res.error));
         else { setGameState(res.state!); resolve(res as { roomId: string; state: GameState }); }
       });
@@ -58,8 +72,9 @@ export function useSocket() {
   }, []);
 
   const joinRoom = useCallback((roomId: string, playerName: string, walletAddress?: string): Promise<{ state: GameState }> => {
+    if (typeof window !== 'undefined') localStorage.setItem('svn_name', playerName);
     return new Promise((resolve, reject) => {
-      getSocket().emit('join_room', { roomId, playerName, walletAddress }, (res: { state?: GameState; error?: string }) => {
+      getSocket().emit('join_room', { roomId, playerName, walletAddress, clientId: getClientId() }, (res: { state?: GameState; error?: string }) => {
         if (res.error) reject(new Error(res.error));
         else { setGameState(res.state!); resolve(res as { state: GameState }); }
       });

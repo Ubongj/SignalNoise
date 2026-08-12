@@ -30,12 +30,20 @@ export default function GamePage() {
   const [playerName, setPlayerName] = useState('');
   const [joinError, setJoinError]   = useState('');
 
-  // Try to pull existing state first (handles demo redirect), then show the name
-  // entry. Falls through even if the socket hasn't connected — so a connection
-  // problem surfaces as the name screen (with error + "Connecting…"), never an
-  // infinite spinner.
+  // On connect (including reconnect after a reload), if this browser has a saved
+  // name, auto-(re)join — the server reattaches us to our existing slot via the
+  // persistent clientId. New visitors with no saved name get the name screen.
+  // If the socket can't connect at all, fall through to the name screen (with its
+  // error + "Connecting…" state) rather than an infinite spinner.
   useEffect(() => {
     if (!roomId) return;
+    const savedName = typeof window !== 'undefined' ? localStorage.getItem('svn_name') : null;
+    if (connected && savedName) {
+      joinRoom(roomId, savedName, address)
+        .then(() => setJoinState('in_game'))
+        .catch(() => setJoinState(s => (s === 'in_game' ? s : 'name_entry')));
+      return;
+    }
     if (connected) requestState();
     const fallback = setTimeout(() => {
       setJoinState(s => s === 'checking' ? 'name_entry' : s);
