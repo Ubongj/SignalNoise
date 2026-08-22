@@ -307,15 +307,15 @@ function Compass({ className }: { className?: string }) {
     <svg viewBox="0 0 200 200" className={className} role="img" aria-label="Compass">
       <defs>
         <radialGradient id="face" cx="50%" cy="40%" r="70%">
-          <stop offset="0%" stopColor="#222a3a" />
-          <stop offset="100%" stopColor="#0b1323" />
+          <stop offset="0%" stopColor="#12303f" />
+          <stop offset="100%" stopColor="#001623" />
         </radialGradient>
       </defs>
 
       {/* rings */}
-      <circle cx={C} cy={C} r="98" fill="#18202f" stroke="#3e484f" strokeWidth="1.5" />
-      <circle cx={C} cy={C} r="90" fill="url(#face)" stroke="#3e484f" strokeWidth="1" />
-      <circle cx={C} cy={C} r="70" fill="none" stroke="#3e484f" strokeWidth="0.75" opacity="0.6" />
+      <circle cx={C} cy={C} r="98" fill="#0a2634" stroke="#33454f" strokeWidth="1.5" />
+      <circle cx={C} cy={C} r="90" fill="url(#face)" stroke="#33454f" strokeWidth="1" />
+      <circle cx={C} cy={C} r="70" fill="none" stroke="#33454f" strokeWidth="0.75" opacity="0.6" />
 
       {/* ticks */}
       {ticks.map((t, i) => (
@@ -325,13 +325,13 @@ function Compass({ className }: { className?: string }) {
           y1={t.y1}
           x2={t.x2}
           y2={t.y2}
-          stroke={t.long ? '#bdc8d1' : '#3e484f'}
+          stroke={t.long ? '#c3ced4' : '#33454f'}
           strokeWidth={t.long ? 1.4 : 0.8}
         />
       ))}
 
       {/* cardinal labels */}
-      <g fill="#bdc8d1" fontFamily="var(--font-mono)" fontSize="11" fontWeight="700" textAnchor="middle">
+      <g fill="#c3ced4" fontFamily="var(--font-mono)" fontSize="11" fontWeight="700" textAnchor="middle">
         <text x={C} y="38">N</text>
         <text x="166" y="105">E</text>
         <text x={C} y="172">S</text>
@@ -340,13 +340,13 @@ function Compass({ className }: { className?: string }) {
 
       {/* needle (animated) */}
       <g className="compass-needle">
-        <polygon points="100,44 93,102 107,102" fill="#4ade80" />
-        <polygon points="100,156 93,98 107,98" fill="#475569" />
+        <polygon points="100,44 93,102 107,102" fill="#0ad9dc" />
+        <polygon points="100,156 93,98 107,98" fill="#3c5561" />
       </g>
 
       {/* hub */}
-      <circle cx={C} cy={C} r="11" fill="#18202f" stroke="#3e484f" strokeWidth="1" />
-      <text x={C} y="104" fill="#4ade80" fontFamily="var(--font-mono)" fontSize="9" fontWeight="700" textAnchor="middle">
+      <circle cx={C} cy={C} r="11" fill="#0a2634" stroke="#33454f" strokeWidth="1" />
+      <text x={C} y="104" fill="#0ad9dc" fontFamily="var(--font-mono)" fontSize="9" fontWeight="700" textAnchor="middle">
         SN
       </text>
     </svg>

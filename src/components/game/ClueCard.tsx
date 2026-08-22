@@ -36,7 +36,7 @@ export function ClueCard({
 }) {
   const toneClass =
     tone === 'real'
-      ? 'border-accent-green/40 bg-accent-green/[0.08] text-accent-green shadow-[0_0_16px_rgba(74,222,128,0.15)]'
+      ? 'border-accent-green/40 bg-accent-green/[0.08] text-accent-green shadow-[0_0_16px_rgba(10,217,220,0.15)]'
       : tone === 'fake'
         ? 'border-white/10 bg-white/[0.03] text-ink-variant'
         : 'border-white/10 bg-white/[0.06] text-ink hover:border-primary/50 hover:bg-white/[0.09]';

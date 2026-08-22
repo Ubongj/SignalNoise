@@ -4,11 +4,11 @@ import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from 'react
 /**
  * UI primitives for Signal vs Noise.
  *
- * Clean modern dark theme:
- *  - Green (#4ade80) primary brand color.
- *  - Space Grotesk throughout; normal sentence case (no shouting caps).
- *  - Soft rounded corners, subtle borders, restrained glows.
- *  - Team A = red (#f43f5e), Team B = blue (#38bdf8).
+ * Fhenix dark theme (navy-teal ground #001623):
+ *  - Cyan (#0ad9dc) primary brand color.
+ *  - Gilbert Qualifi Demo (display) + Product Sans (body); sentence case.
+ *  - Sharp corners, hairline teal borders, restrained cyan glows.
+ *  - Team A = pink (#ff6b8a), Team B = blue (#02c8ff).
  *
  * Tokens live in tailwind.config.js (bg.*, outline.*, ink.*, primary.*, accent.*).
  */

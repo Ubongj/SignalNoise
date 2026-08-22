@@ -39,7 +39,7 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  color: #dbe2f8;
+  color: #dbe4ea;
   font-family: var(--font-space);
   -webkit-font-smoothing: antialiased;
 }
@@ -47,16 +47,16 @@ body {
 /* Ambient depth shared across every screen (matches the landing glow) */
 body {
   background:
-    radial-gradient(45rem 45rem at 18% -8%, rgba(74, 222, 128, 0.07), transparent 60%),
-    radial-gradient(42rem 42rem at 100% 28%, rgba(56, 189, 248, 0.06), transparent 60%),
-    #0b1323;
+    radial-gradient(45rem 45rem at 18% -8%, rgba(10, 217, 220, 0.09), transparent 60%),
+    radial-gradient(42rem 42rem at 100% 28%, rgba(2, 200, 255, 0.07), transparent 60%),
+    #001623;
   background-attachment: fixed;
   min-height: 100vh;
 }
 
 ::selection {
-  background: rgba(74, 222, 128, 0.35);
-  color: #0b1323;
+  background: rgba(10, 217, 220, 0.35);
+  color: #001623;
 }
 
 ::-webkit-scrollbar {
@@ -64,11 +64,11 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #060e1d;
+  background: #000e18;
 }
 ::-webkit-scrollbar-thumb {
-  background: #3e484f;
-  border-radius: 3px;
+  background: #33454f;
+  border-radius: 0;
 }
 
 /* ─── Design system ──────────────────────────────────────────────────────── */
@@ -77,52 +77,53 @@ body {
 /* legacy alias — some components still reference `font-orbitron` */
 .font-orbitron { font-family: var(--font-space); }
 
-/* Soft glow used sparingly on primary actions / active elements */
-.glow-green { box-shadow: 0 0 18px rgba(74, 222, 128, 0.35); }
-.glow-red   { box-shadow: 0 0 18px rgba(244, 63, 94, 0.35); }
-.glow-blue  { box-shadow: 0 0 18px rgba(56, 189, 248, 0.35); }
+/* Soft glow used sparingly on primary actions / active elements.
+   Class names kept for compatibility; colors are now Fhenix cyan/blue/pink. */
+.glow-green { box-shadow: 0 0 18px rgba(10, 217, 220, 0.35); }
+.glow-red   { box-shadow: 0 0 18px rgba(255, 107, 138, 0.35); }
+.glow-blue  { box-shadow: 0 0 18px rgba(2, 200, 255, 0.35); }
 
 /* Subtle accent-tinted border for elevated/active cards */
-.glow-border-green { box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.5), 0 0 16px 0 rgba(74, 222, 128, 0.18); }
-.glow-border-blue  { box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5), 0 0 16px 0 rgba(56, 189, 248, 0.18); }
-.glow-border-red   { box-shadow: 0 0 0 1px rgba(244, 63, 94, 0.5),  0 0 16px 0 rgba(244, 63, 94, 0.18); }
+.glow-border-green { box-shadow: 0 0 0 1px rgba(10, 217, 220, 0.5), 0 0 16px 0 rgba(10, 217, 220, 0.18); }
+.glow-border-blue  { box-shadow: 0 0 0 1px rgba(2, 200, 255, 0.5), 0 0 16px 0 rgba(2, 200, 255, 0.18); }
+.glow-border-red   { box-shadow: 0 0 0 1px rgba(255, 107, 138, 0.5),  0 0 16px 0 rgba(255, 107, 138, 0.18); }
 
 /* Segmented progress blocks (round timer / session cycle) */
 .block-progress-container > span {
   width: 8px;
   height: 16px;
-  border-radius: 2px;
-  background-color: #4ade80;
+  border-radius: 0;
+  background-color: #0ad9dc;
   opacity: 0.2;
   transition: opacity 0.2s, box-shadow 0.2s;
 }
 .block-progress-container > span.active {
   opacity: 1;
-  box-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+  box-shadow: 0 0 8px rgba(10, 217, 220, 0.6);
 }
 
-/* Card surfaces — soft rounded corners */
+/* Card surfaces — Fhenix sharp corners */
 .game-card {
-  background: #18202f;
-  border: 1px solid #3e484f;
-  border-radius: 12px;
+  background: #0e2c3b;
+  border: 1px solid #33454f;
+  border-radius: 0;
 }
 .game-card-glass {
-  background: rgba(19, 28, 43, 0.7);
+  background: rgba(10, 38, 50, 0.7);
   backdrop-filter: blur(12px);
-  border: 1px solid #3e484f;
-  border-radius: 12px;
+  border: 1px solid #33454f;
+  border-radius: 0;
 }
 
 /* Team colors */
-.team-a { color: #f43f5e; }
-.team-b { color: #38bdf8; }
+.team-a { color: #ff6b8a; }
+.team-b { color: #02c8ff; }
 
 /* Role colors */
 .role-guesser  { color: #fbbf24; }
-.role-helper   { color: #4ade80; }
-.role-saboteur { color: #f43f5e; }
-.role-observer { color: #94a3b8; }
+.role-helper   { color: #0ad9dc; }
+.role-saboteur { color: #ff6b8a; }
+.role-observer { color: #7e909a; }
 
 /* Motion helpers */
 @keyframes slideUp { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

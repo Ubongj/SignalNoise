@@ -4,41 +4,54 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Cyberpunk-terminal surface stack (deep navy void → elevated slate)
+        // Fhenix surface stack (deep navy-teal ground → elevated teal)
         bg: {
-          DEFAULT: '#0b1323',   // background / "the void"
-          lowest: '#060e1d',    // side rails, lowest containers
-          surface: '#131c2b',   // surface-container-low
-          card: '#18202f',      // surface-container
-          elevated: '#222a3a',  // surface-container-high
-          bright: '#31394a',
+          DEFAULT: '#001623',   // ground / "the void"
+          lowest: '#000e18',    // side rails, lowest containers
+          surface: '#0a2634',   // surface-container-low
+          card: '#0e2c3b',      // surface-container
+          elevated: '#143543',  // surface-container-high
+          bright: '#1c4152',
         },
-        // Terminal outlines
+        // Fhenix hairline outlines
         outline: {
-          DEFAULT: '#3e484f',   // subtle 1px borders
-          strong: '#87929a',
+          DEFAULT: '#33454f',   // subtle 1px borders
+          strong: '#5b6b74',
         },
         // On-surface text
         ink: {
-          DEFAULT: '#dbe2f8',
-          variant: '#bdc8d1',
+          DEFAULT: '#e8eff2',
+          variant: '#9fb0b8',
         },
-        // Primary brand = green
+        // Primary brand = Fhenix cyan
         primary: {
-          DEFAULT: '#4ade80',
-          dim: '#22c55e',
+          DEFAULT: '#0ad9dc',
+          dim: '#08b7ba',
         },
         accent: {
-          red: '#f43f5e',
-          blue: '#38bdf8',
-          green: '#4ade80',
+          red: '#ff6b8a',
+          blue: '#02c8ff',
+          green: '#0ad9dc',
           yellow: '#fbbf24',
           purple: '#a78bfa',
         },
         team: {
-          a: '#f43f5e',
-          b: '#38bdf8',
+          a: '#ff6b8a',
+          b: '#02c8ff',
         },
+      },
+      // Fhenix corners are sharp — collapse the whole radius scale to 0,
+      // keeping only `full` for genuinely circular elements (dots, avatars).
+      borderRadius: {
+        none: '0',
+        sm: '0',
+        DEFAULT: '0',
+        md: '0',
+        lg: '0',
+        xl: '0',
+        '2xl': '0',
+        '3xl': '0',
+        full: '9999px',
       },
       fontFamily: {
         sans: ['var(--font-space)', 'system-ui', 'sans-serif'],
