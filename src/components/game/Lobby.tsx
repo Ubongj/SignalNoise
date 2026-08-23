@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { GameState, TeamId } from '@/types/game';
 import { OnChainBadge } from '@/components/web3/OnChainBadge';
+import { CATEGORIES } from '@/lib/categories';
 
 interface LobbyProps {
   gameState: GameState;
@@ -11,6 +12,7 @@ interface LobbyProps {
 
 export function Lobby({ gameState, onChooseTeam, onStartGame, error }: LobbyProps) {
   const { players, playerId, roomId } = gameState;
+  const catMeta = CATEGORIES.find(c => c.key === gameState.category);
   const [copied, setCopied]   = useState(false);
   const [starting, setStarting] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
@@ -97,6 +99,14 @@ export function Lobby({ gameState, onChooseTeam, onStartGame, error }: LobbyProp
                 <OnChainBadge roomCode={roomId} />
               </div>
             </>
+          )}
+          {(catMeta || gameState.categoryLabel) && (
+            <div className="mt-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 border border-outline text-ink-variant text-xs">
+                <span>{catMeta?.emoji ?? '🎲'}</span>
+                <span>Theme: <span className="text-ink font-medium">{gameState.categoryLabel ?? catMeta?.label}</span></span>
+              </span>
+            </div>
           )}
         </div>
 

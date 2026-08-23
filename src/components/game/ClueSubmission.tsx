@@ -4,7 +4,7 @@ import { Timer } from '@/components/ui/Timer';
 
 interface ClueSubmissionProps {
   gameState: GameState;
-  onSubmitClues: (clues: string[]) => void;
+  onSubmitClues: (clues: string[]) => void | Promise<void>;
 }
 
 export function ClueSubmission({ gameState, onSubmitClues }: ClueSubmissionProps) {
@@ -34,7 +34,8 @@ export function ClueSubmission({ gameState, onSubmitClues }: ClueSubmissionProps
     const W = (word || '').toUpperCase();
     for (const c of filled) {
       const C = c.trim().toUpperCase();
-      if (C.includes(' ')) { setError('Single words only — no spaces.'); return false; }
+      if (!/^[A-Z]+$/.test(C)) { setError('Single word, letters only — no spaces, numbers or symbols.'); return false; }
+      if (C.length < 3) { setError('Each clue must be at least 3 letters — no initials or abbreviations.'); return false; }
       if (W && C === W) {
         setError('You cannot use the word itself as a clue.'); return false;
       }
@@ -43,14 +44,24 @@ export function ClueSubmission({ gameState, onSubmitClues }: ClueSubmissionProps
       if (W && C.length >= 3 && (W.includes(C) || C.includes(W))) {
         setError(`"${c}" is part of the word — pick a different clue.`); return false;
       }
+      // No giving away the start of the word.
+      if (W && W.length >= 2 && C.slice(0, 2) === W.slice(0, 2)) {
+        setError(`Clue can't start with the word's first two letters.`); return false;
+      }
     }
     return true;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) return;
     setSubmitted(true);
-    onSubmitClues(clues.filter(c => c.trim()));
+    try {
+      await onSubmitClues(clues.filter(c => c.trim()));
+    } catch (e) {
+      // Server rejected a clue (e.g. not a real word) — let them fix it.
+      setSubmitted(false);
+      setError(e instanceof Error ? e.message : 'A clue was rejected — pick different words.');
+    }
   };
 
   const guesser = players.find(p => p.id === roundMeta?.guesserId);
@@ -197,7 +208,7 @@ export function ClueSubmission({ gameState, onSubmitClues }: ClueSubmissionProps
 
         {/* Rules reminder */}
         <div className="text-ink-variant/60 text-xs">
-          <p>Single word · no spelling tricks · no rhyming · no using the word itself</p>
+          <p>Real single word · no acronyms · not part of the word · not its first two letters</p>
         </div>
 
         {error && <p className="text-accent-red text-sm">{error}</p>}

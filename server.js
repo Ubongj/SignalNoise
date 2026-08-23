@@ -73,8 +73,134 @@ function getBotClues(word, type, count) {
   return shuffled.slice(0, count);
 }
 
-const WORDS = Object.keys(CLUE_BANK);
+// Additional words that extend the bank into themed categories. Each carries the
+// same {helpful, misleading} bot-clue hints so demo bots play well in any theme.
+const EXTRA_CLUES = {
+  // ── Crypto & Blockchain ──
+  ETHEREUM:  { helpful: ['CONTRACT','GAS','VITALIK','MERGE'],          misleading: ['PHYSICAL','GOLD','SLOW','PAPER'] },
+  WALLET:    { helpful: ['KEYS','FUNDS','SECURE','STORE'],             misleading: ['EMPTY','SPEND','LOSE','OPEN'] },
+  MINING:    { helpful: ['HASH','REWARD','COMPUTE','ENERGY'],          misleading: ['IDLE','SLEEP','MANUAL','REST'] },
+  LEDGER:    { helpful: ['RECORD','BALANCE','ENTRIES','PUBLIC'],       misleading: ['SECRET','ERASE','BLANK','PRIVATE'] },
+  TOKEN:     { helpful: ['ASSET','MINT','DIGITAL','TRADE'],            misleading: ['CASH','BADGE','PHYSICAL','JUNK'] },
+  STAKING:   { helpful: ['LOCK','REWARD','VALIDATE','YIELD'],          misleading: ['SPEND','WITHDRAW','GAMBLE','IDLE'] },
+  PROTOCOL:  { helpful: ['RULES','NETWORK','STANDARD','LAYER'],        misleading: ['CHAOS','RANDOM','BROKEN','SOLO'] },
+  GENESIS:   { helpful: ['FIRST','BLOCK','ORIGIN','START'],            misleading: ['LAST','FINAL','RECENT','END'] },
+  // ── Science ──
+  GRAVITY:   { helpful: ['FORCE','NEWTON','MASS','FALL'],              misleading: ['FLOAT','WEIGHTLESS','RISE','PUSH'] },
+  ATOM:      { helpful: ['TINY','NUCLEUS','ELEMENT','PARTICLE'],       misleading: ['HUGE','PLANET','VISIBLE','WHOLE'] },
+  ECLIPSE:   { helpful: ['SHADOW','ALIGN','SOLAR','BLOCK'],            misleading: ['BRIGHT','APART','NOON','CLEAR'] },
+  NEURON:    { helpful: ['BRAIN','SIGNAL','SYNAPSE','NERVE'],          misleading: ['MUSCLE','BONE','STILL','SILENT'] },
+  VOLTAGE:   { helpful: ['ELECTRIC','CURRENT','POWER','CHARGE'],       misleading: ['STILL','DEAD','WATER','CALM'] },
+  ENZYME:    { helpful: ['PROTEIN','CATALYST','DIGEST','REACT'],       misleading: ['INERT','STONE','SLOW','BLOCK'] },
+  MOLECULE:  { helpful: ['BOND','ATOMS','COMPOUND','TINY'],            misleading: ['SINGLE','HUGE','METAL','SOLO'] },
+  // ── Animals ──
+  DOLPHIN:   { helpful: ['SMART','OCEAN','CLICKS','LEAP'],             misleading: ['SLOW','DESERT','DULL','SINK'] },
+  ELEPHANT:  { helpful: ['TRUNK','HUGE','TUSK','MEMORY'],              misleading: ['TINY','SMOOTH','FAST','LIGHT'] },
+  PENGUIN:   { helpful: ['WADDLE','ANTARCTIC','TUXEDO','COLD'],        misleading: ['DESERT','FLYING','WARM','SPRINT'] },
+  OCTOPUS:   { helpful: ['TENTACLES','INK','EIGHT','OCEAN'],           misleading: ['LEGS','DRY','SINGLE','LAND'] },
+  TIGER:     { helpful: ['STRIPES','JUNGLE','ROAR','FELINE'],          misleading: ['SPOTS','TAME','PURR','ARCTIC'] },
+  FALCON:    { helpful: ['SWIFT','DIVE','HUNTER','WINGS'],             misleading: ['SLOW','WALK','PREY','GROUND'] },
+  PANDA:     { helpful: ['BAMBOO','BLACK','CHINA','BEAR'],             misleading: ['MEAT','DESERT','TINY','STRIPED'] },
+  // ── Places & Countries ──
+  PARIS:     { helpful: ['FRANCE','EIFFEL','SEINE','LOUVRE'],          misleading: ['DESERT','LONDON','RURAL','BEACH'] },
+  TOKYO:     { helpful: ['JAPAN','NEON','SUSHI','CROWDED'],            misleading: ['QUIET','EUROPE','VILLAGE','COLD'] },
+  EGYPT:     { helpful: ['PYRAMIDS','NILE','PHARAOH','DESERT'],        misleading: ['ARCTIC','FOREST','MODERN','OCEAN'] },
+  ICELAND:   { helpful: ['GEYSER','NORDIC','GLACIER','VOLCANIC'],      misleading: ['TROPICAL','WARM','DESERT','FLAT'] },
+  SAHARA:    { helpful: ['DESERT','DUNES','AFRICA','ARID'],            misleading: ['SNOW','OCEAN','FOREST','COLD'] },
+  VENICE:    { helpful: ['CANALS','GONDOLA','ITALY','WATER'],          misleading: ['DESERT','HILLS','DRY','MODERN'] },
+  BRAZIL:    { helpful: ['AMAZON','SAMBA','CARNIVAL','SOCCER'],        misleading: ['ARCTIC','DESERT','QUIET','TINY'] },
+  EVEREST:   { helpful: ['PEAK','TALLEST','HIMALAYA','CLIMB'],         misleading: ['VALLEY','SHORT','BEACH','FLAT'] },
+  SYDNEY:    { helpful: ['OPERA','HARBOUR','AUSTRALIA','BEACH'],       misleading: ['LANDLOCKED','FROZEN','EUROPE','DESERT'] },
+  KENYA:     { helpful: ['SAFARI','AFRICA','SAVANNA','WILDLIFE'],      misleading: ['ARCTIC','URBAN','OCEAN','SNOW'] },
+  // ── Famous People ──
+  EINSTEIN:  { helpful: ['RELATIVITY','PHYSICS','GENIUS','THEORY'],    misleading: ['PAINTER','ATHLETE','SINGER','ACTOR'] },
+  SHAKESPEARE:{helpful: ['PLAYWRIGHT','HAMLET','SONNET','BARD'],       misleading: ['SCIENTIST','PAINTER','MODERN','SILENT'] },
+  NEWTON:    { helpful: ['GRAVITY','PHYSICS','APPLE','LAWS'],          misleading: ['PAINTER','SINGER','MODERN','CHEMISTRY'] },
+  CLEOPATRA: { helpful: ['EGYPT','QUEEN','PHARAOH','NILE'],            misleading: ['KING','MODERN','PEASANT','EUROPE'] },
+  MOZART:    { helpful: ['COMPOSER','SYMPHONY','PIANO','AUSTRIA'],     misleading: ['PAINTER','SCIENTIST','SILENT','MODERN'] },
+  GANDHI:    { helpful: ['PEACE','INDIA','PROTEST','NONVIOLENT'],      misleading: ['WARRIOR','KING','VIOLENT','EUROPE'] },
+  TESLA:     { helpful: ['ELECTRIC','INVENTOR','COILS','CURRENT'],     misleading: ['PAINTER','SINGER','STEAM','ANCIENT'] },
+  DARWIN:    { helpful: ['EVOLUTION','SPECIES','FINCHES','NATURAL'],   misleading: ['PHYSICS','PAINTER','KING','FIXED'] },
+  PICASSO:   { helpful: ['PAINTER','CUBISM','SPAIN','ABSTRACT'],       misleading: ['SCIENTIST','WRITER','REALIST','SINGER'] },
+  LINCOLN:   { helpful: ['PRESIDENT','ABRAHAM','UNION','HONEST'],      misleading: ['KING','PAINTER','MODERN','EUROPE'] },
+  // ── Food & Drink ──
+  TACO:      { helpful: ['MEXICAN','SHELL','FILLING','CRUNCH'],        misleading: ['SUSHI','SOUP','SWEET','BLAND'] },
+  CHOCOLATE: { helpful: ['COCOA','SWEET','DARK','MELT'],              misleading: ['SOUR','SAVORY','FROZEN','PLAIN'] },
+  PANCAKE:   { helpful: ['SYRUP','FLAT','BREAKFAST','STACK'],         misleading: ['SAVORY','TALL','DINNER','SPICY'] },
+  ESPRESSO:  { helpful: ['COFFEE','SHOT','STRONG','ITALIAN'],         misleading: ['WEAK','TEA','COLD','SWEET'] },
+  MANGO:     { helpful: ['TROPICAL','FRUIT','SWEET','JUICY'],         misleading: ['SOUR','ARCTIC','VEGETABLE','BLAND'] },
+  NOODLE:    { helpful: ['PASTA','LONG','SLURP','WHEAT'],             misleading: ['SHORT','SOLID','RICE','CRISP'] },
+  BURGER:    { helpful: ['PATTY','GRILL','BEEF','STACK'],             misleading: ['SUSHI','SOUP','SWEET','RAW'] },
+  // ── Nature ──
+  CANYON:    { helpful: ['GORGE','DEEP','CARVED','RIVER'],            misleading: ['FLAT','PEAK','SHALLOW','OCEAN'] },
+  DESERT:    { helpful: ['SAND','DRY','DUNES','ARID'],               misleading: ['WET','FOREST','OCEAN','LUSH'] },
+  // ── Myth & Fantasy ──
+  WIZARD:    { helpful: ['SPELLS','MAGIC','STAFF','ROBE'],           misleading: ['WARRIOR','MUGGLE','SWORD','ORDINARY'] },
+  KRAKEN:    { helpful: ['SEA','MONSTER','TENTACLES','LEGEND'],      misleading: ['TINY','LAND','GENTLE','REAL'] },
+  GRIFFIN:   { helpful: ['EAGLE','LION','WINGS','MYTH'],             misleading: ['REAL','FISH','TAME','TINY'] },
+  GOBLIN:    { helpful: ['GREEN','SNEAKY','CAVE','SMALL'],           misleading: ['GIANT','KIND','ANGELIC','TALL'] },
+  SORCERER:  { helpful: ['MAGIC','SPELLS','DARK','POWER'],           misleading: ['KNIGHT','FARMER','WEAK','ORDINARY'] },
+  GOLEM:     { helpful: ['CLAY','STONE','GUARDIAN','ANIMATED'],      misleading: ['FLESH','TINY','FRAGILE','LIVING'] },
+};
+Object.assign(CLUE_BANK, EXTRA_CLUES);
+
 const BOT_NAMES = ['Nova', 'Echo', 'Cipher'];
+
+// ─── CATEGORIES ────────────────────────────────────────────────────────────
+// Host picks a theme at room creation; the round word pool is drawn from it.
+const ALL_WORDS = Object.keys(CLUE_BANK);
+
+const CATEGORY_META = [
+  { key: 'mixed',   label: 'Mixed',               emoji: '🎲' },
+  { key: 'crypto',  label: 'Crypto & Blockchain', emoji: '🪙' },
+  { key: 'science', label: 'Science',             emoji: '🔬' },
+  { key: 'animals', label: 'Animals',             emoji: '🐾' },
+  { key: 'places',  label: 'Places & Countries',  emoji: '🌍' },
+  { key: 'people',  label: 'Famous People',       emoji: '👑' },
+  { key: 'food',    label: 'Food & Drink',        emoji: '🍜' },
+  { key: 'nature',  label: 'Nature',              emoji: '🌋' },
+  { key: 'fantasy', label: 'Myth & Fantasy',      emoji: '🐉' },
+];
+
+const CATEGORY_WORDS = {
+  crypto:  ['BITCOIN','ETHEREUM','WALLET','MINING','LEDGER','TOKEN','STAKING','PROTOCOL','GENESIS','ORACLE','CIPHER'],
+  science: ['GRAVITY','ATOM','ECLIPSE','NEURON','VOLTAGE','ENZYME','MOLECULE','GALAXY','NEBULA','TELESCOPE','PRISM','ROCKET'],
+  animals: ['WOLF','EAGLE','SHARK','DOLPHIN','ELEPHANT','PENGUIN','OCTOPUS','TIGER','FALCON','PANDA'],
+  places:  ['PARIS','TOKYO','EGYPT','ICELAND','SAHARA','VENICE','BRAZIL','EVEREST','SYDNEY','KENYA'],
+  people:  ['EINSTEIN','SHAKESPEARE','NEWTON','CLEOPATRA','MOZART','GANDHI','TESLA','DARWIN','PICASSO','LINCOLN'],
+  food:    ['PIZZA','SUSHI','RAMEN','TACO','CHOCOLATE','PANCAKE','ESPRESSO','MANGO','NOODLE','BURGER'],
+  nature:  ['OCEAN','MOUNTAIN','FOREST','VOLCANO','GLACIER','TORNADO','THUNDER','AURORA','HURRICANE','CASCADE','LAVA','EMBER','CANYON','DESERT'],
+  fantasy: ['DRAGON','PHOENIX','PHANTOM','LABYRINTH','VORTEX','WIZARD','KRAKEN','GRIFFIN','GOBLIN','SORCERER','GOLEM'],
+  mixed:   ALL_WORDS,
+};
+
+function normalizeCategory(key) { return CATEGORY_WORDS[key] ? key : 'mixed'; }
+function getCategoryWords(key)  { const l = CATEGORY_WORDS[normalizeCategory(key)]; return (l && l.length) ? l : ALL_WORDS; }
+function categoryLabel(key)     { const m = CATEGORY_META.find(c => c.key === normalizeCategory(key)); return m ? m.label : 'Mixed'; }
+
+// ─── CLUE VALIDATION (anti-cheat) ────────────────────────────────────────────
+// A real-word dictionary plus every curated bank word/clue, so themed/proper-noun
+// clues pass but gibberish and acronyms don't.
+const ALLOWED_WORDS = new Set(require('an-array-of-english-words'));
+for (const w of ALL_WORDS) ALLOWED_WORDS.add(w.toLowerCase());
+for (const v of Object.values(CLUE_BANK)) {
+  for (const t of [...(v.helpful || []), ...(v.misleading || [])]) ALLOWED_WORDS.add(t.toLowerCase());
+}
+
+// Returns an error string if the clue is illegal, or null if it's allowed.
+function validateClue(raw, word) {
+  const c = String(raw ?? '').trim();
+  if (!c) return 'Clue cannot be empty.';
+  if (!/^[A-Za-z]+$/.test(c)) return 'Single word, letters only — no spaces, numbers or symbols.';
+  const C = c.toUpperCase();
+  const W = String(word ?? '').toUpperCase();
+  if (C.length < 3) return 'Clue must be at least 3 letters — no initials or abbreviations.';
+  if (C === W) return 'You cannot use the secret word itself.';
+  if (W.length >= 3 && (W.includes(C) || C.includes(W))) return `"${c}" is part of the word — pick a different clue.`;
+  if (W.length >= 2 && C.slice(0, 2) === W.slice(0, 2)) return `Clue can't start with the word's first two letters.`;
+  if (!ALLOWED_WORDS.has(c.toLowerCase())) return `"${c}" isn't a recognized word — no acronyms or made-up words.`;
+  return null;
+}
 
 // ─── GAME STORE ──────────────────────────────────────────────────────────────
 
@@ -124,8 +250,9 @@ function setPhase(room, phase) {
 
 // ─── ROOM MANAGEMENT ─────────────────────────────────────────────────────────
 
-function createRoom(socketId, playerName, isDemo, walletAddress, clientId) {
+function createRoom(socketId, playerName, isDemo, walletAddress, clientId, category) {
   const roomId = generateId();
+  const cat = normalizeCategory(category);
   const room = {
     id: roomId,
     players: [{ id: socketId, clientId: clientId || socketId, name: playerName, team: 'A', isHost: true, connected: true, isBot: false, address: walletAddress || null }],
@@ -133,7 +260,8 @@ function createRoom(socketId, playerName, isDemo, walletAddress, clientId) {
     currentRound: 0,
     rounds: [],
     scores: { A: 0, B: 0 },
-    wordPool: shuffle(WORDS),
+    category: cat,
+    wordPool: shuffle(getCategoryWords(cat)),
     winner: null,
     phaseEndsAt: null,
     phaseDuration: null,
@@ -334,17 +462,25 @@ function submitClues(socketId, clues, _io) {
   const player = room.players.find(p => p.id === socketId);
   if (!player) return { error: 'Player not found.' };
 
-  if (socketId === round.helperId) {
-    round.helperClues = clues.slice(0, 3).filter(c => c.trim()).map(c => ({
-      text: c.trim().toUpperCase(), playerId: socketId, playerName: player.name, type: 'helpful',
-    }));
-  } else if (socketId === round.saboteurId) {
-    round.saboteurClues = clues.slice(0, 2).filter(c => c.trim()).map(c => ({
-      text: c.trim().toUpperCase(), playerId: socketId, playerName: player.name, type: 'misleading',
-    }));
-  } else {
-    return { error: 'Not your turn to submit clues.' };
+  const isHelper = socketId === round.helperId;
+  const isSaboteur = socketId === round.saboteurId;
+  if (!isHelper && !isSaboteur) return { error: 'Not your turn to submit clues.' };
+
+  const need = isHelper ? 3 : 2;
+  const list = (Array.isArray(clues) ? clues : []).map(c => String(c ?? '').trim()).filter(Boolean).slice(0, need);
+  if (list.length < need) return { error: `Submit all ${need} clues.` };
+
+  // Authoritative anti-cheat: reject invalid words, acronyms, the word itself,
+  // word fragments, and clues sharing the word's first two letters.
+  for (const c of list) {
+    const reason = validateClue(c, round.word);
+    if (reason) return { error: reason };
   }
+
+  const type = isHelper ? 'helpful' : 'misleading';
+  const built = list.map(c => ({ text: c.toUpperCase(), playerId: socketId, playerName: player.name, type }));
+  if (isHelper) round.helperClues = built;
+  else          round.saboteurClues = built;
 
   broadcastState(roomId, _io);
   maybeTriggerReveal(roomId, _io);
@@ -462,7 +598,7 @@ function playAgain(socketId) {
   room.scores       = { A: 0, B: 0 };
   room.winner       = null;
   room.phaseEndsAt  = null;
-  room.wordPool     = shuffle(WORDS);
+  room.wordPool     = shuffle(getCategoryWords(room.category));
   broadcastState(roomId, io);
 }
 
@@ -485,6 +621,8 @@ function buildStateForPlayer(room, playerId) {
     playerId,
     role,
     winner:        room.winner,
+    category:      room.category || 'mixed',
+    categoryLabel: categoryLabel(room.category),
   };
 
   if (!round || !isPlaying) return state;
@@ -548,10 +686,10 @@ app.prepare().then(() => {
 
   io.on('connection', (socket) => {
 
-    socket.on('create_room', ({ playerName, isDemo, walletAddress, clientId }, cb) => {
-      console.log(`[create_room] player="${playerName}" isDemo=${isDemo} socket=${socket.id}`);
+    socket.on('create_room', ({ playerName, isDemo, walletAddress, clientId, category }, cb) => {
+      console.log(`[create_room] player="${playerName}" isDemo=${isDemo} category=${category} socket=${socket.id}`);
       try {
-        const room = createRoom(socket.id, playerName, isDemo, walletAddress, clientId);
+        const room = createRoom(socket.id, playerName, isDemo, walletAddress, clientId, category);
         socket.join(room.id);
         cb?.({ roomId: room.id, state: buildStateForPlayer(room, socket.id) });
         broadcastState(room.id, io);
@@ -581,9 +719,10 @@ app.prepare().then(() => {
       cb?.({});
     });
 
-    socket.on('submit_clues', ({ clues }) => {
+    socket.on('submit_clues', ({ clues }, cb) => {
       const result = submitClues(socket.id, clues, io);
-      if (result.error) socket.emit('game_error', { message: result.error });
+      if (result.error) { cb?.({ error: result.error }); return; }
+      cb?.({});
     });
 
     socket.on('submit_guess', ({ guess }) => {

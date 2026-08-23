@@ -61,10 +61,10 @@ export function useSocket() {
     };
   }, []);
 
-  const createRoom = useCallback((playerName: string, isDemo: boolean = false, walletAddress?: string): Promise<{ roomId: string; state: GameState }> => {
+  const createRoom = useCallback((playerName: string, isDemo: boolean = false, walletAddress?: string, category?: string): Promise<{ roomId: string; state: GameState }> => {
     if (typeof window !== 'undefined') localStorage.setItem('svn_name', playerName);
     return new Promise((resolve, reject) => {
-      getSocket().emit('create_room', { playerName, isDemo, walletAddress, clientId: getClientId() }, (res: { roomId?: string; state?: GameState; error?: string }) => {
+      getSocket().emit('create_room', { playerName, isDemo, walletAddress, clientId: getClientId(), category }, (res: { roomId?: string; state?: GameState; error?: string }) => {
         if (res.error) reject(new Error(res.error));
         else { setGameState(res.state!); resolve(res as { roomId: string; state: GameState }); }
       });
@@ -94,8 +94,13 @@ export function useSocket() {
     });
   }, []);
 
-  const submitClues = useCallback((clues: string[]) => {
-    getSocket().emit('submit_clues', { clues });
+  const submitClues = useCallback((clues: string[]): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      getSocket().emit('submit_clues', { clues }, (res?: { error?: string }) => {
+        if (res?.error) reject(new Error(res.error));
+        else resolve();
+      });
+    });
   }, []);
 
   const submitGuess = useCallback((guess: string) => {

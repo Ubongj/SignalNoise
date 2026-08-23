@@ -8,6 +8,7 @@ import { Button, Card, Input } from '@/components/ui/primitives';
 import { useToast } from '@/components/ui/Toast';
 import { saveOnChainRoom } from '@/lib/onchainHistory';
 import { ConnectWallet } from '@/components/web3/ConnectWallet';
+import { CATEGORIES } from '@/lib/categories';
 import {
   signalVsNoiseAddress,
   signalVsNoiseAbi,
@@ -38,6 +39,10 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState('');
   const [showHowTo, setShowHowTo] = useState(false);
+  const [category, setCategory] = useState('mixed');
+  const [chain, setChain] = useState<'off' | 'on'>('off');
+
+  const onRightChain = chainId === arbitrumSepolia.id;
 
   useEffect(() => {
     if (router.query.join) setMode('join');
@@ -88,8 +93,8 @@ export default function Home() {
     setLoading(true);
     setFormError('');
     try {
-      const { roomId } = await createRoom(playerName.trim(), false, address);
-      recordRoomOnChain(roomId); // non-blocking
+      const { roomId } = await createRoom(playerName.trim(), false, address, category);
+      if (chain === 'on') recordRoomOnChain(roomId); // non-blocking; only when host opted in
       router.push(`/game/${roomId}`);
     } catch (e: unknown) {
       setFormError(e instanceof Error ? e.message : 'Failed to create room');
@@ -116,7 +121,7 @@ export default function Home() {
     setLoading(true);
     setFormError('');
     try {
-      const { roomId } = await createRoom(playerName.trim(), true);
+      const { roomId } = await createRoom(playerName.trim(), true, undefined, category);
       router.push(`/game/${roomId}`);
     } catch (e: unknown) {
       setFormError(e instanceof Error ? e.message : 'Failed to start demo');
@@ -237,6 +242,68 @@ export default function Home() {
                 maxLength={20}
                 autoFocus
               />
+
+              {/* Game mode — off-chain vs on-chain */}
+              <div>
+                <label className="text-ink-variant text-xs font-medium block mb-2">Game mode</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setChain('off')}
+                    className={`px-3 py-2.5 border text-center transition-colors ${
+                      chain === 'off' ? 'border-primary bg-primary/10 text-ink' : 'border-outline text-ink-variant hover:border-outline-strong'
+                    }`}
+                  >
+                    <span className="text-sm font-semibold">⚡ Off-chain</span>
+                    <span className="block text-[10px] text-ink-variant/70 mt-0.5">Fast · no wallet</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setChain('on')}
+                    className={`px-3 py-2.5 border text-center transition-colors ${
+                      chain === 'on' ? 'border-primary bg-primary/10 text-ink' : 'border-outline text-ink-variant hover:border-outline-strong'
+                    }`}
+                  >
+                    <span className="text-sm font-semibold">🔗 On-chain</span>
+                    <span className="block text-[10px] text-ink-variant/70 mt-0.5">Records to Arbitrum</span>
+                  </button>
+                </div>
+                {chain === 'on' && (
+                  <div className="mt-2 text-xs">
+                    {!isConnected ? (
+                      <div className="flex items-center justify-between gap-2 bg-white/5 border border-outline px-3 py-2">
+                        <span className="text-ink-variant">Connect a wallet to record the room on-chain.</span>
+                        <ConnectWallet />
+                      </div>
+                    ) : !onRightChain ? (
+                      <p className="text-accent-yellow">Wrong network — switch to Arbitrum Sepolia to record on-chain (the game still plays either way).</p>
+                    ) : (
+                      <p className="text-primary">✓ This room will be recorded on-chain when you create it.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Word category — the theme for the game */}
+              <div>
+                <label className="text-ink-variant text-xs font-medium block mb-2">Word category</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {CATEGORIES.map(c => (
+                    <button
+                      key={c.key}
+                      type="button"
+                      onClick={() => setCategory(c.key)}
+                      className={`px-2 py-2 border text-center transition-colors ${
+                        category === c.key ? 'border-primary bg-primary/10 text-ink' : 'border-outline text-ink-variant hover:border-outline-strong'
+                      }`}
+                    >
+                      <span className="text-base leading-none block">{c.emoji}</span>
+                      <span className="block text-[10px] leading-tight mt-1">{c.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <Button onClick={handleCreate} disabled={loading || !connected} fullWidth>
                 {loading ? 'Creating…' : 'Create game →'}
               </Button>

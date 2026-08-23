@@ -59,6 +59,8 @@ export interface GameState {
   playerId: string;
   role: PlayerRole | null;
   winner: TeamId | 'TIE' | null;
+  category?: string;
+  categoryLabel?: string;
   word?: string;
   clues?: string[];
   cluesAnnotated?: Clue[];
