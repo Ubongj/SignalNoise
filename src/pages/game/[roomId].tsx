@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAccount } from 'wagmi';
 import { useSocket } from '@/hooks/useSocket';
+import { analytics } from '@/lib/analytics';
 import { GameHeader } from '@/components/game/GameHeader';
 import { Lobby } from '@/components/game/Lobby';
 import { RoleReveal } from '@/components/game/RoleReveal';
@@ -58,6 +59,24 @@ export default function GamePage() {
       setJoinState('in_game');
     }
   }, [gameState, roomId]);
+
+  // Analytics: count each game once (fired by the host only, so a 4-player
+  // game is one "play", not four). No-op unless analytics is configured.
+  const startedRef = useRef(false);
+  const overRef = useRef(false);
+  useEffect(() => {
+    if (!gameState) return;
+    const isHost = !!gameState.players.find(p => p.id === gameState.playerId)?.isHost;
+    if (!isHost) return;
+    if (gameState.phase === 'ROLE_REVEAL' && gameState.currentRound === 1 && !startedRef.current) {
+      startedRef.current = true;
+      analytics.gameStarted({ category: gameState.category, players: gameState.players.length });
+    }
+    if (gameState.phase === 'GAME_OVER' && !overRef.current) {
+      overRef.current = true;
+      analytics.gameOver({ category: gameState.category, winner: gameState.winner ?? 'unknown' });
+    }
+  }, [gameState]);
 
   // Pre-fill saved name
   useEffect(() => {

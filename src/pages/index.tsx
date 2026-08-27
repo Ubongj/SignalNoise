@@ -9,6 +9,7 @@ import { useToast } from '@/components/ui/Toast';
 import { saveOnChainRoom } from '@/lib/onchainHistory';
 import { ConnectWallet } from '@/components/web3/ConnectWallet';
 import { CATEGORIES } from '@/lib/categories';
+import { analytics } from '@/lib/analytics';
 import {
   signalVsNoiseAddress,
   signalVsNoiseAbi,
@@ -94,6 +95,7 @@ export default function Home() {
     setFormError('');
     try {
       const { roomId } = await createRoom(playerName.trim(), false, address, category);
+      analytics.roomCreated({ category, chain, wallet: isConnected });
       if (chain === 'on') recordRoomOnChain(roomId); // non-blocking; only when host opted in
       router.push(`/game/${roomId}`);
     } catch (e: unknown) {
@@ -109,6 +111,7 @@ export default function Home() {
     setFormError('');
     try {
       await joinRoom(roomCode.trim().toUpperCase(), playerName.trim(), address);
+      analytics.roomJoined();
       router.push(`/game/${roomCode.trim().toUpperCase()}`);
     } catch (e: unknown) {
       setFormError(e instanceof Error ? e.message : 'Failed to join room');
@@ -122,6 +125,7 @@ export default function Home() {
     setFormError('');
     try {
       const { roomId } = await createRoom(playerName.trim(), true, undefined, category);
+      analytics.demoStarted({ category });
       router.push(`/game/${roomId}`);
     } catch (e: unknown) {
       setFormError(e instanceof Error ? e.message : 'Failed to start demo');

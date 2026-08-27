@@ -1,5 +1,6 @@
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
+import Script from 'next/script';
 import '@/styles/globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
 
@@ -16,6 +17,16 @@ const queryClient = new QueryClient();
 // crawlers get an absolute og:image. Falls back to a relative path in dev.
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
 const ogImage = `${siteUrl}/og.png`;
+
+// Privacy-friendly analytics (Umami or Plausible). Set these in Railway to
+// activate; with them unset, no script loads and tracking is a no-op.
+//   Umami:     NEXT_PUBLIC_ANALYTICS_SRC = https://cloud.umami.is/script.js
+//              NEXT_PUBLIC_ANALYTICS_WEBSITE_ID = <your website id>
+//   Plausible: NEXT_PUBLIC_ANALYTICS_SRC = https://plausible.io/js/script.js
+//              NEXT_PUBLIC_ANALYTICS_DOMAIN = <your site domain>
+const analyticsSrc    = process.env.NEXT_PUBLIC_ANALYTICS_SRC || '';
+const analyticsSiteId = process.env.NEXT_PUBLIC_ANALYTICS_WEBSITE_ID || '';
+const analyticsDomain = process.env.NEXT_PUBLIC_ANALYTICS_DOMAIN || '';
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -57,6 +68,15 @@ export default function App({ Component, pageProps }: AppProps) {
             <meta name="twitter:description" content="Four players. Five clues. Only you know who's lying." />
             <meta name="twitter:image" content={ogImage} />
           </Head>
+          {analyticsSrc && (analyticsSiteId || analyticsDomain) && (
+            <Script
+              src={analyticsSrc}
+              strategy="afterInteractive"
+              defer
+              data-website-id={analyticsSiteId || undefined}
+              data-domain={analyticsDomain || undefined}
+            />
+          )}
           <ToastProvider>
             <ErrorBoundary>
               <Component {...pageProps} />
